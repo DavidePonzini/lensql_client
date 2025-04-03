@@ -1,0 +1,32 @@
+services:
+  client:
+    # image: davideponzini/lensql_client:1
+    build: ./client
+    container_name: lensql_client
+    ports:
+      - "8888:80"
+
+  server:
+    # image: davideponzini/lensql_server:1
+    build: ./server
+    container_name: lensql_client_server
+    depends_on:
+      - db
+    environment:
+      LENSQL_HOST: https://ponzidav.com/lensql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: postgres
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+
+  db:
+    image: postgres:latest
+    container_name: lensql_client_db
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - lensql_client_pgdata:/var/lib/postgresql/data
+
+volumes:
+  lensql_client_pgdata:
