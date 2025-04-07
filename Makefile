@@ -10,16 +10,16 @@ else
 	VENV_BIN=$(VENV)/bin
 endif
 
-.PHONY: start start_bg $(VENV)_upgrade
+.PHONY: start psql $(VENV)_upgrade
 
-start: $(ENV) $(VENV)
-	sudo service postgresql start
-	source $(ENV) && $(VENV_BIN)/python server/main.py
+start:
+	docker compose down
+	docker rmi lensql_client-server
+	docker compose up
 
-start_bg: $(ENV) $(VENV)
-	sudo service postgresql start
-	mkdir -p log
-	source $(ENV) && nohup $(VENV_BIN)/python ./main.py > log/$(shell date +%Y-%m-%d.%H:%M:%S).txt 2>&1 &
+psql:
+	docker exec -it lensql_client_db psql -U postgres
+
 
 $(ENV):
 	cp $(ENV).template $(ENV)

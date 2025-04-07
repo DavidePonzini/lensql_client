@@ -3,10 +3,8 @@ from flask_cors import CORS
 import json
 import pandas as pd
 
-
-from client.server.sql_errors import SQLException
-import llm
-import client.server.db as db
+import db
+from sql_errors import SQLException
 
 
 app = Flask(__name__)
@@ -14,7 +12,10 @@ CORS(app)
 
 
 def response(data: pd.DataFrame | SQLException) -> str:
-    return str(data)
+    if isinstance(data, SQLException):
+        return str(data)
+    
+    return data.to_json(orient='split')
 
 @app.route('/run-query', methods=['POST'])
 def run_query():

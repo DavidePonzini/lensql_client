@@ -1,15 +1,10 @@
 services:
-  client:
-    # image: davideponzini/lensql_client:1
-    build: ./client
-    container_name: lensql_client
-    ports:
-      - "8888:80"
-
   server:
     # image: davideponzini/lensql_server:1
-    build: ./server
+    build: .
     container_name: lensql_client_server
+    ports:
+      - "5000:5000"
     depends_on:
       - db
     environment:

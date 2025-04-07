@@ -3,7 +3,7 @@ import pandas as pd
 import psycopg2
 from psycopg2.extensions import connection
 from dav_tools import messages
-from client.server.sql_errors import SQLException
+from sql_errors import SQLException
 
 HOST        =       os.getenv('DB_HOST')
 PORT        =   int(os.getenv('DB_PORT'))
