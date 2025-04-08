@@ -14,7 +14,7 @@ endif
 
 start:
 	docker compose down
-	docker rmi lensql_client-server
+	docker rmi lensql_client-server || :
 	docker compose up
 
 psql:
