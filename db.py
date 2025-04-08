@@ -16,6 +16,14 @@ PASSWORD = None
 
 CONNECTION: connection = None
 
+def connection_status() -> str:
+    '''Returns the connection status.'''
+
+    if CONNECTION is None:
+        return 'No connection'
+    
+    
+
 def are_credentials_set():
     '''Checks if all database credentials are set.'''
 
@@ -63,7 +71,7 @@ def connect(dbname: str, username: str, password: str) -> bool:
         return False
     
 
-def execute_query(query_str: str) -> Iterator[pd.DataFrame | str | SQLException]:
+def execute_query(query_str: str) -> Iterator[tuple[pd.DataFrame | str | SQLException, str]]:
     '''
     Executes a query on the database and returns the result as a DataFrame.
     - If the query is a SELECT statement, the result will be a DataFrame.
@@ -89,14 +97,14 @@ def execute_query(query_str: str) -> Iterator[pd.DataFrame | str | SQLException]
                 columns = [desc[0] for desc in cur.description]
                 result = pd.DataFrame(rows, columns=columns)
                 
-                yield result
+                yield result, statement.query
             else:  # No result set, return the number of affected rows
                 if cur.rowcount < 0:
-                    yield f'{statement.first_token}'
+                    yield f'{statement.first_token}', statement.query
                 else:
-                    yield f'{statement.first_token} {cur.rowcount}'
+                    yield f'{statement.first_token} {cur.rowcount}', statement.query
         except Exception as e:
-            yield SQLException(e)
+            yield SQLException(e), statement.query
         finally:
             cur.close()
             # conn.close()
