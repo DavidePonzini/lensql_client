@@ -1,8 +1,9 @@
-FROM python:3.11
+FROM python:latest
 
 WORKDIR /app
 
 # Requirements
+RUN pip install --no-cache-dir --upgrade pip
 COPY *.py .
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
