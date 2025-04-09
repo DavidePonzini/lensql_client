@@ -1,19 +1,45 @@
 html {
-    --chat-bg-color: #FFF4DB;
-    --bg-color: #FFF4DB;
-    --bg-color-code: #FFFFFF;
+    --chat-bg-color-success: lightblue;
+    --chat-bg-color-error: lightcoral;
+    --chat-bg-color-builtin: lightslategray;
+    --message-bg-color: #FFF4DB;
+    --message-bg-color-code: #FFFFFF;
     --text-color: #000000;
     --icon-width: 50px;
     --icon-margin: 10px;
 }
 
 .chat {
-    background-color: var(--chat-bg-color);
     padding: 1rem;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-top: 1rem;
 }
+
+.chat.success {
+    background-color: var(--chat-bg-color-success);
+}
+
+.chat.error {
+    background-color: var(--chat-bg-color-error);
+}
+
+.chat.builtin {
+    background-color: var(--chat-bg-color-builtin);
+}
+
+.chat .thinking {
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.9;
+    }
+  }
 
 table {
     width: auto!important;
@@ -50,9 +76,9 @@ table {
 
 .message {
     position: relative;
-    border: 2px solid var(--bg-color);
+    border: 2px solid var(--message-bg-color);
     border-radius: 6px;
-    background: var(--bg-color);
+    background: var(--message-bg-color);
     color: var(--text-color);
     font-size: 14px;
     line-height: 1.5;
@@ -78,13 +104,13 @@ table {
 .messagebox-assistant .message:after {
     left: -10px;
     border-width: 8px 10px 8px 0;
-    border-color: transparent var(--bg-color) transparent transparent;
+    border-color: transparent var(--message-bg-color) transparent transparent;
 }
 
 .messagebox-user .message:after {
     right: -10px;
     border-width: 8px 0 8px 10px;
-    border-color: transparent transparent transparent var(--bg-color);
+    border-color: transparent transparent transparent var(--message-bg-color);
 }
 
 .m {
@@ -93,7 +119,7 @@ table {
 
 .code {
     font-size: 1.4em;
-    background: var(--bg-color-code);
+    background: var(--message-bg-color-code);
     color: var(--text-color);
     padding-left: 1rem!important;
     padding-right: 1rem!important;

@@ -1,39 +1,36 @@
 let CHAT_ID = 0;
 
 class Message {
-    constructor(content, is_from_assistant, msg_id) {
+    constructor(content, is_from_assistant, chat) {
         this.content = content;
         this.is_from_assistant = is_from_assistant;
+        this.chat = chat;
+        this.msg_id = chat.last_message_id() + 1;
         this.feedback = null;
-        this.msg_id = msg_id;
 
-        this.elem = $('<div></div>')
+        this.html = $('<div></div>')
             .addClass('messagebox')
-            .addClass(is_from_assistant ? 'messagebox-assistant' : 'messagebox-user')
-            .attr('id', `msg-${msg_id}`);
+            .addClass(is_from_assistant ? 'messagebox-assistant' : 'messagebox-user');
             
         if (is_from_assistant)
-            this.elem.append(ICON_ASSISTANT);
+            this.html.append(ICON_ASSISTANT);
 
         let message = $('<div></div>')
             .addClass('message')
             .html(content);
         
-        this.elem.append(message);
+        this.html.append(message);
 
         if (is_from_assistant) {
             let feedback = $('<div></div>')
-                .addClass('message-feedback')
-                .attr('id', `feedback-${msg_id}`);
+                .addClass('message-feedback');
 
             let feedback_up = $('<span></span>')
                 .addClass('feedback-up')
-                .attr('id', `feedback-up-${msg_id}`)
                 .html('<i class="fas fa-thumbs-up"></i>');
 
             let feedback_down = $('<span></span>')
                 .addClass('feedback-down')
-                .attr('id', `feedback-down-${msg_id}`)
                 .html('<i class="fas fa-thumbs-down"></i>');
 
             feedback.append(feedback_up);
@@ -43,58 +40,60 @@ class Message {
         }
             
         if (!is_from_assistant)
-            this.elem.append(ICON_USER);
+            this.html.append(ICON_USER);
     }
 
     set_feedback(feedback) {
         this.feedback = feedback;
     }
+
+    remove() {
+        this.html.remove();
+    }
 }
 
 class Chat {
-    constructor(query, is_builtin) {
+    constructor(query) {
         CHAT_ID += 1;
         this.id = CHAT_ID;
-
         this.query = query;
-        this.is_builtin = is_builtin;
-        
         this.messages = [];
 
-        this.elem = $('<div></div>')
+        this.html = $('<div></div>')
             .addClass('chat')
             .attr('id', `chat-${CHAT_ID}`);
 
-        let title = $('<div></div>').addClass('chat-title');
-        if (this.is_builtin) {
-            let icon = $('<i></i>')
-                .addClass('fas fa-search');
-            title.append(icon);
-            title.append('<br/>');
-            let span = $('<span></span>').text(query);
-            title.append(span);
-        } else {
-            let icon = $('<i></i>')
-                .addClass('fas fa-user');
-            title.append(icon);
-            let pre = $('<pre></pre>').text(query);
-            title.append(pre);
-        }
-        this.elem.append(title);
-        this.elem.append($('<hr></hr>'));
+            
+        this.add_title();
+    }
+
+    last_message_id() {
+        if (this.messages.length == 0)
+            return 0;
         
-        $('#result').append(this.elem);
+        return this.messages[this.messages.length - 1].msg_id;
+    }
+
+    show() {
+        $('#result').append(this.html);
+    }
+    
+    add_title() {
+        let title = $('<div></div>').addClass('chat-title');
+        this.html.append(title);
+        this.html.append($('<hr></hr>'));
+
+        return title;
     }
 
     add_message(content, is_from_assistant) {
-        let msg_id = this.messages.length + 1;
-        let message = new Message(content, is_from_assistant, msg_id);
+        let message = new Message(content, is_from_assistant, this);
         this.messages.push(message);
         
-        this.elem.append(message.elem);
-        this.elem[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        this.html.append(message.html);
+        this.html[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        return msg_id;
+        return message;
     }
 
     display_table(json_data) {
@@ -132,14 +131,157 @@ class Chat {
     
         table.append(tbody);
         
-        this.elem.append(table);
-        this.elem[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        this.html.append(table);
+        this.html[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     
     display_text(text) {
         let pre = $('<pre></pre>').text(text);
-        this.elem.append(pre);
-        this.elem[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        this.html.append(pre);
+        this.html[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    show_buttons() {
+        // To be implemented in subclasses
+    }
+}
+
+class UserChat extends Chat {
+    constructor(query) {
+        super(query);
+
+        this.thiking_message = null;
+    }
+
+    add_title() {
+        let title = super.add_title();
+        let icon = $('<i></i>')
+                .addClass('fas fa-user');
+            title.append(icon);
+            let pre = $('<pre></pre>').text(this.query);
+            title.append(pre);
+
+        return title;
+    }
+
+    show_buttons() {
+        if (this.buttons)
+            return;
+    
+        let buttons = $('<div></div>').addClass('buttons');
+        
+        this.buttons = buttons;
+        this.html.append(buttons);
+    }
+
+    add_button(text, onclick) {
+        if (!this.buttons)
+            return;
+
+        let button = $('<button></button>')
+            .addClass('btn btn-primary')
+            .text(text)
+            .on('click', onclick);
+        
+        this.buttons.append(button);
+    }
+
+    remove_buttons() {
+        if (!this.buttons)
+            return;
+
+        this.buttons.remove();
+        this.buttons = null;
+    }
+
+    start_thinking() {
+        if (this.thiking_message)
+            return;
+
+        this.thiking_message = this.add_message('Thinking...', true);
+        this.thiking_message.html.addClass('thinking');
+    }
+
+    stop_thinking() {
+        if (this.thiking_message) {
+            this.thiking_message.remove();
+            this.thiking_message = null;
+        }
+    }
+}
+
+class ErrorChat extends UserChat {
+    constructor(query) {
+        super(query);
+
+        this.html.addClass('error');
+    }
+
+    show_buttons() {
+        super.show_buttons();
+
+        this.add_button('Explain error', () => {
+            this.add_message('Explain the error', false);
+            this.remove_buttons();
+            this.start_thinking();
+        });
+
+        this.add_button('Show example', () => {
+            this.add_message('Show me a simpler example that can cause this error', false);
+            this.remove_buttons();
+        });
+
+        this.add_button('Where to look', () => {
+            this.add_message('Locate the error in the code', false);
+            this.remove_buttons();
+        });
+
+        this.add_button('Suggest fix', () => {
+            this.add_message('Suggest a fix for the error', false);
+            this.remove_buttons();
+        });
+    }
+}
+
+class ResultChat extends UserChat {
+    constructor(query) {
+        super(query);
+
+        this.html.addClass('success');
+    }
+
+    show_buttons() {
+        super.show_buttons();
+
+        this.add_button('Describe query', () => {
+            this.add_message('Describe what this query does', false);
+            this.remove_buttons();
+        });
+
+        this.add_button('Explain query', () => {
+            this.add_message('Explain step by step how this query works', false);
+            this.remove_buttons();
+        });
+    }
+}
+
+class BuiltinChat extends Chat {
+    constructor(query) {
+        super(query);
+
+        this.html.addClass('builtin');
+    }
+
+    add_title() {
+        let title = super.add_title();
+        let icon = $('<i></i>')
+                .addClass('fas fa-search');
+            title.append(icon);
+            title.append('<br/>');
+            let span = $('<span></span>').text(this.query);
+            title.append(span);
+
+        return title;
     }
 }
 

@@ -1,31 +1,39 @@
 TMP_CHATS = [];
 
 function display(json_data) {
-    let result = $('#result');
     clear_result();
     
     let data = JSON.parse(json_data);
     
     for (let i = 0; i < data.length; i++) {
-        let item = data[i];
-        let status = item['status'];
-        let query = item['query'];
-        let is_builtin = item['is_builtin'];
-        
-        let chat = new Chat(query, is_builtin);
+        let item        = data[i];
+        let success     = item['success'];
+        let builtin     = item['builtin'];
+        let type        = item['type'];
+        let query       = item['query'];
+        let item_data   = item['data'];
+
+        let chat;
+        if (builtin) {
+            chat = new BuiltinChat(query);
+        } else if (success) {
+            chat = new ResultChat(query);
+        } else {
+            chat = new ErrorChat(query);
+        }
+
         TMP_CHATS.push(chat);
 
-        if (status === 'exception') {
-            chat.display_text(item['message']);
-        } else if (status === 'success_data') {
-            chat.display_table(item['result']);
-        } else if (status === 'success_message') {
-            chat.display_text(item['message']);
-        } else if (status === 'error') {
-            chat.display_text(item['message']);
+        if (type === 'message') {
+            chat.display_text(item_data);
+        } else if (type === 'dataset') {
+            chat.display_table(item_data);
         } else {
             console.error(item);
         }
+
+        chat.show_buttons();
+        chat.show();
     }
 }
 

@@ -26,34 +26,37 @@ def response_query(*results: tuple[pd.DataFrame | str | SQLException, str], is_b
         print(query_result, type(query_result))
         if isinstance(query_result, SQLException):
             result.append({
-                'status': 'exception',
-                'message': str(query_result),
+                'success': False,
+                'builtin': is_builtin,
+                'type': 'message',
                 'query': query,
-                'is_builtin': is_builtin,
+                'data': str(query_result),
             })
         
         elif isinstance(query_result, str):
             result.append({
-                'status': 'success_message',
-                'message': query_result,
+                'success': True,
+                'builtin': is_builtin,
+                'type': 'message',
                 'query': query,
-                'is_builtin': is_builtin,
+                'data': query_result,
             })
 
         elif isinstance(query_result, pd.DataFrame):
             result.append({
-                'status': 'success_data',
-                'result': query_result.to_json(orient='split'),
+                'success': True,
+                'builtin': is_builtin,
+                'type': 'dataset',
                 'query': query,
-                'is_builtin': is_builtin,
+                'data': query_result.to_json(orient='split'),
             })
-
         else:
             result.append({
-                'status': 'error',
-                'message': 'Unknown error',
+                'success': False,
+                'builtin': is_builtin,
+                'type': 'message',
                 'query': query,
-                'is_builtin': is_builtin,
+                'data': 'Unknown error',
             })
 
     return json.dumps(result)
