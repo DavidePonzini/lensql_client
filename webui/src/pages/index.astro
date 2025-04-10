@@ -5,26 +5,16 @@ import Page from '../layouts/Page.astro';
 import ConnectionLensQL from '../components/ConnectionLensQL.astro';
 import ConnectionDB from '../components/ConnectionDB.astro';
 import Query from '../components/Query.astro';
+import Connection from '../components/Connection.astro';
 ---
 
 <Page title="LensQL">
     <Background>
-        <Section title="LensQL">
-            <div class="row">
-                <div class="col">
-                    <ConnectionLensQL/>
-                </div>
-                <div class="col">
-                    <ConnectionDB/>
-                </div>
-            </div>
-        </Section>
+        <Connection/>
 
-        <Section title="Query">
-            <Query/>
-        </Section>
+        <Query/>
     </Background>
 </Page>
 
-<script is:inline src="scripts/messages.js"></script>
-<script is:inline src="scripts/display.js"></script>
+<script is:inline src="/scripts/messages.js"></script>
+<script is:inline src="/scripts/display.js"></script>

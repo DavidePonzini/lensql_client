@@ -123,7 +123,12 @@ class Chat {
             // row.append(index_cell);
     
             for (let j = 0; j < rows[i].length; j++) {
-                let cell = $('<td></td>').text(rows[i][j]);
+                let text = rows[i][j];
+                if (text === null) {
+                    text = 'NULL';
+                }
+
+                let cell = $('<td></td>').text(text);
                 row.append(cell);
             }
             tbody.append(row);
@@ -224,21 +229,28 @@ class ErrorChat extends UserChat {
             this.add_message('Explain the error', false);
             this.remove_buttons();
             this.start_thinking();
+            // $.ajax({
+            //     url: 'http://ponzidav.com/lensql/explain-error',
+            //     type: 'POST',
+            //     contentType: 'application/json',
         });
 
         this.add_button('Show example', () => {
             this.add_message('Show me a simpler example that can cause this error', false);
             this.remove_buttons();
+            this.start_thinking();
         });
 
         this.add_button('Where to look', () => {
             this.add_message('Locate the error in the code', false);
             this.remove_buttons();
+            this.start_thinking();
         });
 
         this.add_button('Suggest fix', () => {
             this.add_message('Suggest a fix for the error', false);
             this.remove_buttons();
+            this.start_thinking();
         });
     }
 }
@@ -256,11 +268,13 @@ class ResultChat extends UserChat {
         this.add_button('Describe query', () => {
             this.add_message('Describe what this query does', false);
             this.remove_buttons();
+            this.start_thinking();
         });
 
         this.add_button('Explain query', () => {
             this.add_message('Explain step by step how this query works', false);
             this.remove_buttons();
+            this.start_thinking();
         });
     }
 }

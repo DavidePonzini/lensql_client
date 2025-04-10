@@ -25,6 +25,7 @@ const { id } = Astro.props;
     const onInputExtension = EditorView.updateListener.of(onInputUpdate);
 
     window.editor = new EditorView({
+        doc: '\n\n\n\n\n\n\n\n\n',
         parent: document.getElementById(id),
         extensions: [
             basicSetup,
@@ -44,7 +45,7 @@ const { id } = Astro.props;
 
 <style>
     div {
-        min-height: 300px;
+        /* min-height: 300px; */
         border: 1px solid #ccc;
         border-radius: 4px;
     }

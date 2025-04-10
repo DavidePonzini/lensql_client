@@ -16,6 +16,15 @@ PASSWORD = None
 
 CONNECTION: connection = None
 
+class QueryResult:
+    def __init__(self, result: pd.DataFrame | str | SQLException, query: str, success: bool):
+        self.result = result
+        self.query = query
+        self.success = success
+
+    def __repr__(self):
+        return f'QueryResult({self.result}, {self.query}, {self.success})'
+
 def connection_status() -> str:
     '''Returns the connection status.'''
 
@@ -33,7 +42,7 @@ def are_credentials_set():
     return True
 
 def get_cursor() -> cursor:
-    '''Returns the current database connection.'''
+    '''Returns a cursor for the database connection.'''
 
     if CONNECTION is None:
         raise Exception('Database connection is not set')
@@ -65,13 +74,15 @@ def connect(dbname: str, username: str, password: str) -> bool:
             password=PASSWORD
         )
 
+        CONNECTION.autocommit = True
+
         return True
     except Exception as e:
         messages.error('Error connecting to the database:', e)
         return False
     
 
-def execute_query(query_str: str) -> Iterator[tuple[pd.DataFrame | str | SQLException, str]]:
+def execute_query(query_str: str) -> Iterator[QueryResult]:
     '''
     Executes a query on the database and returns the result as a DataFrame.
     - If the query is a SELECT statement, the result will be a DataFrame.
@@ -83,6 +94,8 @@ def execute_query(query_str: str) -> Iterator[tuple[pd.DataFrame | str | SQLExce
 
     Returns:
         pd.DataFrame | str | SQLException: The result of the query.
+        str: The original query string.
+        bool: True if the query was successful, False otherwise.
     '''
 
     for statement in SQLCode(query_str).strip_comments().split():
@@ -90,24 +103,21 @@ def execute_query(query_str: str) -> Iterator[tuple[pd.DataFrame | str | SQLExce
             cur = get_cursor()
 
             cur.execute(statement.query)
-            # conn.commit()
                 
             if cur.description:  # Check if the query has a result set
                 rows = cur.fetchall()
                 columns = [desc[0] for desc in cur.description]
-                result = pd.DataFrame(rows, columns=columns)
-                
-                yield result, statement.query
+                yield QueryResult(pd.DataFrame(rows, columns=columns), statement.query, True)
             else:  # No result set, return the number of affected rows
                 if cur.rowcount < 0:
-                    yield f'{statement.first_token}', statement.query
+                    yield QueryResult(f'{statement.first_token}', statement.query, True)
                 else:
-                    yield f'{statement.first_token} {cur.rowcount}', statement.query
+                    yield QueryResult(f'{statement.first_token} {cur.rowcount}', statement.query, True)
         except Exception as e:
-            yield SQLException(e), statement.query
+            yield QueryResult(SQLException(e), statement.query, False)
+            CONNECTION.rollback()
         finally:
             cur.close()
-            # conn.close()
 
 
 def list_users() -> pd.DataFrame:

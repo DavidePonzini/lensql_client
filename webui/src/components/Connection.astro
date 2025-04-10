@@ -1,0 +1,21 @@
+---
+import ConnectionLensQL from "./ConnectionLensQL.astro"
+import ConnectionDB from "./ConnectionDB.astro"
+
+---
+
+<a class="btn btn-primary" data-bs-toggle="offcanvas" href="#connection-panel" role="button" aria-controls="connection-panel">
+    Connect
+</a>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="connection-panel" aria-labelledby="connection-panel-abel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="connection-panel-label">Connection</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ConnectionLensQL/>
+        <hr/>
+        <ConnectionDB/>
+    </div>
+</div>

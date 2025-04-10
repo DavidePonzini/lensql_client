@@ -39,7 +39,7 @@
         const dbpassword = $('#dbpassword').val();
 
         $.ajax({
-            url: 'http://localhost:5000/login',
+            url: 'http://localhost:5000/login-db',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ 

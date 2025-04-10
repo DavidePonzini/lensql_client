@@ -22,12 +22,12 @@
         const username = $('#username').val();
 
         $.ajax({
-            url: 'https://ponzidav.com/lensql/login',
+            url: 'http://localhost:5000/login',
             type: 'POST',
-            // contentType: 'application/json',
-            contentType: 'application/x-www-form-urlencoded',
-            data: { username: username },
-            // data: JSON.stringify({ username: username }),
+            contentType: 'application/json',
+            // contentType: 'application/x-www-form-urlencoded',
+            // data: { username: username },
+            data: JSON.stringify({ username: username }),
             success: function(response) {
                 response = JSON.parse(response);
                 if (response.status == 'error')

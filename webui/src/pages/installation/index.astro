@@ -1,0 +1,31 @@
+---
+import Page from "../../layouts/Page.astro";
+import Background from "../../components/Background.astro";
+import Section from "../../components/Section.astro";
+
+
+---
+
+<Page title="LensQL">
+    <Background>
+        <Section title="Installation">
+            <ol>
+                <li>Install Docker
+                    (<a href="https://docs.docker.com/desktop/setup/install/windows-install/">Windows</a>,
+                    <a href="https://docs.docker.com/engine/install/">Linux</a>,
+                    <a href="https://docs.docker.com/desktop/setup/install/mac-install/">Mac</a>)
+                </li>
+                <li>
+                    <i>(Optional) Test the installation by running:</i>
+                    <pre><code>docker run hello-world</code></pre>
+            </li>
+            </ol>
+        </Section>
+        <Section title="Usage">
+            <ol>
+                <li>Run the following command in the terminal:</li>
+                <pre><code>curl https://ponzidav.com/lensql | docker compose -f - up</code></pre>
+                <li>Open your browser and go to <a href="https://ponzidav.com/lensql2">https://ponzidav.com/lensql2</a></li>
+            </ol>
+    </Background>
+</Page>
